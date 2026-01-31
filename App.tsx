@@ -12,6 +12,7 @@ import RoomDetail from './pages/RoomDetail';
 import Contact from './pages/Contact';
 import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
+import Account from './pages/Account';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import Footer from './components/Footer';
@@ -102,37 +103,31 @@ const App: React.FC = () => {
     setCart((prev) => prev.filter((item) => item.id !== productId));
   };
 
-  const cartCount = useMemo(() => cart.reduce((acc, item) => acc + item.quantity, 0), [cart]);
-
   return (
     <Router>
       <ScrollToTop />
-      <div className="flex flex-col min-h-screen">
-        <Navbar cartCount={cartCount} onOpenCart={() => setIsCartOpen(true)} />
-        <main className="flex-grow pb-20 lg:pb-0">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/rooms" element={<Rooms />} />
-            <Route path="/rooms/:roomId" element={<RoomDetail />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/product/:id" element={<ProductDetail onAddToCart={addToCart} />} />
-          </Routes>
-        </main>
-        <Footer />
-        
-        {/* Mobile Navigation */}
-        <BottomNav cartCount={cartCount} onOpenCart={() => setIsCartOpen(true)} />
-        
-        <CartDrawer 
-          isOpen={isCartOpen} 
-          onClose={() => setIsCartOpen(false)} 
-          cart={cart}
-          onUpdateQuantity={updateCartQuantity}
-          onRemove={removeFromCart}
-        />
-      </div>
+      <Navbar cartCount={cart.length} onOpenCart={() => setIsCartOpen(true)} />
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/rooms" element={<Rooms />} />
+          <Route path="/rooms/:roomId" element={<RoomDetail />} />
+          <Route path="/product/:id" element={<ProductDetail onAddToCart={addToCart} />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/account" element={<Account />} />
+        </Routes>
+      </main>
+      <Footer />
+      <BottomNav cartCount={cart.length} onOpenCart={() => setIsCartOpen(true)} />
+      <CartDrawer 
+        isOpen={isCartOpen} 
+        onClose={() => setIsCartOpen(false)} 
+        cart={cart}
+        onUpdateQuantity={updateCartQuantity}
+        onRemove={removeFromCart}
+      />
     </Router>
   );
 };

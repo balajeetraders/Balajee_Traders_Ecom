@@ -155,11 +155,11 @@ const Home: React.FC = () => {
       {/* 1. Hero Experience */}
       <Hero />
       
-      {/* 2. Featured Taxonomy (Correct Position) */}
-      <CategoryShowcase />
-      
-      {/* 3. Merchandising Toggle (9 Best / 4 New) */}
+      {/* 2. Merchandising Toggle (9 Best / 4 New) - NOW FIRST */}
       <TabbedMerchandising />
+
+      {/* 3. Featured Taxonomy (Correct Position - NOW BELOW TABS) */}
+      <CategoryShowcase />
 
       {/* 4. Immersive Lifestyle Scene */}
       <section className="py-16 md:py-32 bg-stone-50">

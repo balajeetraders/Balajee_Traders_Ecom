@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Instagram, 
   Twitter, 
@@ -14,41 +15,46 @@ import {
 } from 'lucide-react';
 
 const Footer: React.FC = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   return (
     <footer className="w-full">
-      {/* Top Features Bar */}
-      <div className="bg-white border-y border-stone-100">
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 lg:divide-x divide-stone-100">
-          <div className="flex items-center gap-5 p-10 lg:p-12">
-            <Truck size={40} strokeWidth={1} className="text-stone-900" />
-            <div>
-              <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Free shipping</h4>
-              <p className="text-xs text-stone-400 mt-1">Free return & exchange</p>
+      {/* Top Features Bar - Only visible on Home Page */}
+      {isHomePage && (
+        <div className="bg-white border-y border-stone-100 animate-in fade-in duration-700">
+          <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 lg:divide-x divide-stone-100">
+            <div className="flex items-center gap-5 p-10 lg:p-12">
+              <Truck size={40} strokeWidth={1} className="text-stone-900" />
+              <div>
+                <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Free shipping</h4>
+                <p className="text-xs text-stone-400 mt-1">Free return & exchange</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-5 p-10 lg:p-12">
-            <MapPin size={40} strokeWidth={1} className="text-stone-900" />
-            <div>
-              <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Store locator</h4>
-              <p className="text-xs text-stone-400 mt-1">Find nearest store</p>
+            <div className="flex items-center gap-5 p-10 lg:p-12">
+              <MapPin size={40} strokeWidth={1} className="text-stone-900" />
+              <div>
+                <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Store locator</h4>
+                <p className="text-xs text-stone-400 mt-1">Find nearest store</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-5 p-10 lg:p-12">
-            <CreditCard size={40} strokeWidth={1} className="text-stone-900" />
-            <div>
-              <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Secure payment</h4>
-              <p className="text-xs text-stone-400 mt-1">100% secure method</p>
+            <div className="flex items-center gap-5 p-10 lg:p-12">
+              <CreditCard size={40} strokeWidth={1} className="text-stone-900" />
+              <div>
+                <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Secure payment</h4>
+                <p className="text-xs text-stone-400 mt-1">100% secure method</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-5 p-10 lg:p-12">
-            <Headphones size={40} strokeWidth={1} className="text-stone-900" />
-            <div>
-              <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Online support</h4>
-              <p className="text-xs text-stone-400 mt-1">24/7 support center</p>
+            <div className="flex items-center gap-5 p-10 lg:p-12">
+              <Headphones size={40} strokeWidth={1} className="text-stone-900" />
+              <div>
+                <h4 className="text-sm font-bold text-stone-900 uppercase tracking-tight">Online support</h4>
+                <p className="text-xs text-stone-400 mt-1">24/7 support center</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Footer Body */}
       <div className="bg-[#1a202c] text-white pt-24 pb-12">
@@ -68,7 +74,7 @@ const Footer: React.FC = () => {
                 </span>
               </Link>
               <p className="text-stone-400 text-sm leading-relaxed max-w-xs">
-                We are crafting comfort for every home.
+                Premium furniture and architectural home living solutions. Elevating spaces with timeless design.
               </p>
               <div className="flex items-center gap-6">
                 <a href="#" className="text-white hover:opacity-70 transition-opacity"><Facebook size={18} /></a>
@@ -93,7 +99,7 @@ const Footer: React.FC = () => {
               <h4 className="text-xs uppercase font-bold tracking-widest text-white">Information</h4>
               <ul className="space-y-4 text-stone-400 text-xs">
                 <li><a href="#" className="hover:text-white transition-colors">About us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact us</a></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact us</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Payment</a></li>
               </ul>
@@ -102,9 +108,9 @@ const Footer: React.FC = () => {
             <div className="space-y-6">
               <h4 className="text-xs uppercase font-bold tracking-widest text-white">Account</h4>
               <ul className="space-y-4 text-stone-400 text-xs">
-                <li><a href="#" className="hover:text-white transition-colors">My account</a></li>
+                <li><Link to="/account" className="hover:text-white transition-colors">My account</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">Orders</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Checkout</a></li>
+                <li><Link to="/checkout" className="hover:text-white transition-colors">Checkout</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">My wishlists</a></li>
               </ul>
             </div>
@@ -117,7 +123,7 @@ const Footer: React.FC = () => {
                 This site is protected by reCAPTCHA and the Google <a href="#" className="underline">privacy policy</a> and terms of service apply.
               </p>
               <p className="text-[10px] text-stone-500">
-                © 2026 Balajee Traders. All Rights Reserved.
+                © 2025 Balajee Traders. All Rights Reserved.
               </p>
             </div>
             

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Heart, User } from 'lucide-react';
+import { ShoppingBag, Heart, User as UserIcon } from 'lucide-react';
 
 interface NavbarProps {
   cartCount: number;
@@ -74,9 +74,9 @@ const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart }) => {
             <Heart size={20} />
           </Link>
 
-          <button className="hidden sm:block text-stone-900 opacity-60 hover:opacity-100 transition-all">
-            <User size={20} />
-          </button>
+          <Link to="/account" className="hidden sm:block text-stone-900 opacity-60 hover:opacity-100 transition-all">
+            <UserIcon size={20} />
+          </Link>
           
           <button 
             onClick={onOpenCart}
