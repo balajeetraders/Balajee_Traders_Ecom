@@ -1,16 +1,17 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, LayoutGrid, ShoppingBag, User } from 'lucide-react';
+import { Home, Compass, Heart, ShoppingBag, Package } from 'lucide-react';
 
 interface BottomNavProps {
   cartCount: number;
+  wishlistCount: number;
   onOpenCart: () => void;
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ cartCount, onOpenCart }) => {
+const BottomNav: React.FC<BottomNavProps> = ({ cartCount, wishlistCount, onOpenCart }) => {
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 w-full z-[60] bg-white/90 backdrop-blur-xl border-t border-stone-100 pb-safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 w-full z-[60] bg-white/90 backdrop-blur-xl border-t border-stone-100 pb-safe-area-inset-bottom">
       <div className="flex items-center justify-around h-16 px-2">
         <NavLink 
           to="/" 
@@ -44,19 +45,26 @@ const BottomNav: React.FC<BottomNavProps> = ({ cartCount, onOpenCart }) => {
         </button>
 
         <NavLink 
-          to="/rooms" 
+          to="/wishlist" 
           className={({ isActive }) => `flex flex-col items-center gap-1 transition-all ${isActive ? 'text-stone-900' : 'text-stone-400'}`}
         >
-          <LayoutGrid size={22} />
-          <span className="text-[10px] font-bold uppercase tracking-tighter">Rooms</span>
+          <div className="relative">
+            <Heart size={22} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-stone-900 text-white rounded-full text-[8px] flex items-center justify-center font-black">
+                {wishlistCount}
+              </span>
+            )}
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-tighter">Saved</span>
         </NavLink>
 
         <NavLink 
-          to="/account" 
+          to="/orders" 
           className={({ isActive }) => `flex flex-col items-center gap-1 transition-all ${isActive ? 'text-stone-900' : 'text-stone-400'}`}
         >
-          <User size={22} />
-          <span className="text-[10px] font-bold uppercase tracking-tighter">Account</span>
+          <Package size={22} />
+          <span className="text-[10px] font-bold uppercase tracking-tighter">Orders</span>
         </NavLink>
       </div>
     </nav>

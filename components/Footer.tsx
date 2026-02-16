@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Instagram, 
@@ -11,12 +11,28 @@ import {
   CreditCard, 
   Headphones,
   Mail,
-  Phone
+  Phone,
+  Database,
+  WifiOff
 } from 'lucide-react';
+import { isUsingLiveData } from '../services/productService';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 const Footer: React.FC = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const [dataStatus, setDataStatus] = useState<'live' | 'static'>('static');
+
+  // Check status on mount
+  useEffect(() => {
+    // We check purely based on configuration for immediate feedback, 
+    // and rely on the service state for actual data success
+    if (isSupabaseConfigured() && isUsingLiveData) {
+      setDataStatus('live');
+    } else {
+      setDataStatus('static');
+    }
+  }, []);
 
   return (
     <footer className="w-full">
@@ -64,11 +80,11 @@ const Footer: React.FC = () => {
             {/* Brand Column */}
             <div className="lg:col-span-2 space-y-8">
               <Link to="/" className="flex items-center gap-2.5 group">
-                <div className="flex items-end gap-0.5 h-6">
-                  <div className="w-1.5 h-3 bg-white rounded-sm"></div>
-                  <div className="w-1.5 h-6 bg-white rounded-sm"></div>
-                  <div className="w-1.5 h-4 bg-white rounded-sm"></div>
-                </div>
+                <img 
+                  src="/logo.png" 
+                  alt="Balajee Traders" 
+                  className="h-10 w-auto object-contain brightness-0 invert" 
+                />
                 <span className="text-2xl font-bold tracking-tighter text-white">
                   Balajee Traders
                 </span>
@@ -123,21 +139,37 @@ const Footer: React.FC = () => {
                 This site is protected by reCAPTCHA and the Google <a href="#" className="underline">privacy policy</a> and terms of service apply.
               </p>
               <p className="text-[10px] text-stone-500">
-                © 2025 Balajee Traders. All Rights Reserved.
+                © 2026 Balajee Traders. All Rights Reserved.
               </p>
             </div>
             
             <div className="flex flex-col md:flex-row gap-10 md:gap-20">
               <div className="flex flex-col">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-stone-500 mb-2">Need support?</span>
-                <a href="tel:+12345678910" className="text-base font-medium hover:text-stone-300 transition-colors">+1 234 567 8910</a>
+                <a href="tel:+916380473964" className="text-base font-medium hover:text-stone-300 transition-colors">+91 6380473964</a>
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-stone-500 mb-2">Customer care</span>
-                <a href="mailto:info@domain.com" className="text-base font-medium hover:text-stone-300 transition-colors">info@domain.com</a>
+                <a href="mailto:balajeetraderstry@gmail.com" className="text-base font-medium hover:text-stone-300 transition-colors">balajeetraderstry@gmail.com</a>
               </div>
             </div>
           </div>
+          
+          {/* SYSTEM STATUS INDICATOR - VISIBLE TO CONFIRM BACKEND */}
+          <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-center lg:justify-start gap-2 opacity-50 hover:opacity-100 transition-opacity">
+            {dataStatus === 'live' ? (
+              <>
+                <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></div>
+                <span className="text-[9px] font-black uppercase tracking-widest text-green-500">System Status: Live (Backend Active)</span>
+              </>
+            ) : (
+              <>
+                <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
+                <span className="text-[9px] font-black uppercase tracking-widest text-red-500">System Status: Static (Local Mode)</span>
+              </>
+            )}
+          </div>
+
         </div>
       </div>
     </footer>

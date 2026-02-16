@@ -68,7 +68,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, onUpdate
                         <Plus size={10} />
                       </button>
                     </div>
-                    <span className="text-xs font-black text-stone-900">${(item.price * item.quantity).toLocaleString()}</span>
+                    <span className="text-xs font-black text-stone-900">₹{(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -97,11 +97,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, onUpdate
             <div className="space-y-3">
               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-stone-300">
                 <span>Subtotal</span>
-                <span className="text-stone-900">${total.toLocaleString()}</span>
+                <span className="text-stone-900">₹{total.toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-end text-xl font-serif text-stone-900 pt-3 border-t border-stone-100">
                 <span>Total Amount</span>
-                <span className="font-bold text-2xl">${total.toLocaleString()}</span>
+                <span className="font-bold text-2xl">₹{total.toLocaleString()}</span>
               </div>
             </div>
             

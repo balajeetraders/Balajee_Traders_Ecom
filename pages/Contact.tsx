@@ -119,7 +119,7 @@ const Contact: React.FC = () => {
             {/* Image Wrapper */}
             <div className="w-full lg:w-3/5 h-[400px] md:h-[600px] rounded-lg overflow-hidden shadow-2xl reveal-up">
               <img 
-                src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=2000" 
+                src="https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=1600" 
                 alt="Modern cabinet decor" 
                 className="w-full h-full object-cover"
               />

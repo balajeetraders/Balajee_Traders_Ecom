@@ -9,12 +9,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@studio-freight/lenis": "^1.0.42",
+    "@supabase/supabase-js": "^2.95.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "gsap": "^3.14.2",
+    "lucide-react": "^0.563.0",
+    "node-fetch": "^3.3.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router-dom": "^7.13.0",
-    "lucide-react": "^0.563.0",
-    "@studio-freight/lenis": "^1.0.42",
-    "gsap": "^3.14.2"
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

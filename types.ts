@@ -7,7 +7,8 @@ export interface Product {
   room: string;
   style: string;
   material: string;
-  image: string;
+  image: string; // Primary thumbnail (compatibility)
+  images?: string[]; // Full gallery
   description: string;
   rating: number;
   reviewCount: number;
@@ -24,4 +25,12 @@ export interface CartItem extends Product {
   quantity: number;
   selectedColor?: string;
   selectedSize?: string;
+}
+
+export interface Order {
+  id: string;
+  date: string;
+  status: 'Processing' | 'Shipped' | 'Delivered';
+  items: CartItem[];
+  total: number;
 }

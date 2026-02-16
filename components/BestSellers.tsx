@@ -2,22 +2,34 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
-import { PRODUCTS } from '../constants';
+import { fetchProducts } from '../services/productService';
+import { Product } from '../types';
 
 const BestSellers: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'best' | 'new'>('best');
+  const [products, setProducts] = useState<Product[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
-  
-  const displayProducts = activeTab === 'best' 
-    ? PRODUCTS.filter(p => p.featured).slice(0, 9) 
-    : PRODUCTS.filter(p => p.newArrival).slice(0, 9);
 
   useEffect(() => {
-    gsap.fromTo('.product-card-wrapper', 
-      { opacity: 0, scale: 0.9, y: 30 },
-      { opacity: 1, scale: 1, y: 0, stagger: 0.05, duration: 0.8, ease: 'power3.out' }
-    );
-  }, [activeTab]);
+    const loadData = async () => {
+      const data = await fetchProducts();
+      setProducts(data);
+    };
+    loadData();
+  }, []);
+  
+  const displayProducts = activeTab === 'best' 
+    ? products.filter(p => p.featured).slice(0, 9) 
+    : products.filter(p => p.newArrival).slice(0, 9);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      gsap.fromTo('.product-card-wrapper', 
+        { opacity: 0, scale: 0.9, y: 30 },
+        { opacity: 1, scale: 1, y: 0, stagger: 0.05, duration: 0.8, ease: 'power3.out' }
+      );
+    }
+  }, [activeTab, products]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = e.currentTarget;
@@ -48,6 +60,8 @@ const BestSellers: React.FC = () => {
       ease: 'power2.out'
     });
   };
+
+  if (products.length === 0) return null;
 
   return (
     <section ref={sectionRef} className="py-24 bg-white overflow-hidden">
@@ -98,7 +112,7 @@ const BestSellers: React.FC = () => {
                     <h4 className="text-xl font-serif text-white mb-1">
                       {product.name}
                     </h4>
-                    <span className="text-white/80 font-medium">${product.price.toFixed(2)}</span>
+                    <span className="text-white/80 font-medium">₹{product.price.toLocaleString()}</span>
                   </div>
 
                   {/* Badges */}
@@ -114,7 +128,7 @@ const BestSellers: React.FC = () => {
                 {/* Fallback Text for Mobile/Non-hover */}
                 <div className="mt-6 md:hidden text-center">
                   <h4 className="text-lg font-serif text-stone-800">{product.name}</h4>
-                  <span className="text-stone-500 font-medium">${product.price.toFixed(2)}</span>
+                  <span className="text-stone-500 font-medium">₹{product.price.toLocaleString()}</span>
                 </div>
               </Link>
             </div>

@@ -1,19 +1,44 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Loader2 } from 'lucide-react';
 import gsap from 'gsap';
-import { ROOMS, PRODUCTS } from '../constants';
+import { ROOMS } from '../constants';
+import { fetchProducts } from '../services/productService'; // Updated import
+import { Product } from '../types';
+
+const CATEGORY_QUOTES: Record<string, string> = {
+  'Seating': 'The art of repose.',
+  'Tables': 'Foundations for gathering.',
+  'Lighting': 'Illuminating the mood.',
+  'Storage': 'The quiet order of things.',
+  'Beds': 'Sanctuary for the dreaming mind.',
+};
 
 const RoomDetail: React.FC = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [roomProducts, setRoomProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const room = ROOMS.find(r => r.id === roomId);
-  const roomProducts = PRODUCTS.filter(p => p.room === room?.type);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (room) {
+        setLoading(true);
+        const allProducts = await fetchProducts();
+        const filtered = allProducts.filter(p => p.room === room.type);
+        setRoomProducts(filtered);
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [room]);
+
   const roomCategories = Array.from(new Set(roomProducts.map(p => p.category)));
 
   const filteredProducts = activeCategory 
@@ -22,6 +47,8 @@ const RoomDetail: React.FC = () => {
 
   useEffect(() => {
     if (!room) return;
+    if (loading) return;
+
     const ctx = gsap.context(() => {
       gsap.from('.scene-content', {
         y: 60,
@@ -32,7 +59,7 @@ const RoomDetail: React.FC = () => {
       });
     }, containerRef);
     return () => ctx.revert();
-  }, [room]);
+  }, [room, loading]);
 
   useEffect(() => {
     if (activeCategory && gridRef.current) {
@@ -48,7 +75,7 @@ const RoomDetail: React.FC = () => {
   return (
     <div ref={containerRef} className="bg-white min-h-screen">
       {/* Immersive Scene Header */}
-      <section className="relative h-[80vh] md:h-[90vh] overflow-hidden bg-stone-900">
+      <section className="relative h-[60vh] md:h-[90vh] overflow-hidden bg-stone-900">
          <img 
           src={room.image} 
           className="absolute inset-0 w-full h-full object-cover opacity-60" 
@@ -74,51 +101,64 @@ const RoomDetail: React.FC = () => {
                
                {/* Mobile Category Chips */}
                <div className="scene-content flex flex-wrap gap-3">
-                  {roomCategories.map(cat => (
-                    <button 
-                      key={cat}
-                      onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
-                      className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
-                        activeCategory === cat 
-                          ? 'bg-white text-stone-900 border-white shadow-2xl scale-105' 
-                          : 'bg-white/5 text-white border-white/20 hover:bg-white/10'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
+                  {loading ? (
+                    <div className="text-white/50 text-sm flex items-center gap-2"><Loader2 className="animate-spin" size={16}/> Loading pieces...</div>
+                  ) : (
+                    roomCategories.map(cat => (
+                      <button 
+                        key={cat}
+                        onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+                        className={`px-6 py-3 md:px-8 md:py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
+                          activeCategory === cat 
+                            ? 'bg-white text-stone-900 border-white shadow-2xl scale-105' 
+                            : 'bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-sm'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))
+                  )}
                </div>
             </div>
          </div>
       </section>
 
-      {/* Progressive Grid Reveal */}
+      {/* Progressive Grid Reveal - Atmosphere Specific */}
       {activeCategory && (
-        <section className="py-20 md:py-32 bg-[#fafafa] animate-in slide-in-from-bottom-10 duration-1000">
-           <div className="container mx-auto px-6">
-              <div className="flex justify-between items-end mb-12 border-b border-stone-100 pb-10">
-                 <h2 className="text-4xl font-serif text-stone-900">{activeCategory} <span className="italic font-light opacity-30">Selection</span></h2>
-                 <Link to="/shop" className="text-[9px] font-black uppercase tracking-widest text-stone-300 hover:text-stone-900">View All</Link>
+        <section className="py-20 md:py-32 bg-[#fafafa] animate-in slide-in-from-bottom-10 duration-1000 min-h-[50vh]">
+           <div className="container mx-auto px-6 md:px-12">
+              <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-stone-200 pb-10 gap-6">
+                 <div className="space-y-2">
+                   <h2 className="text-4xl md:text-5xl font-serif text-stone-900">
+                     {activeCategory} <span className="italic font-light opacity-30">Collection</span>
+                   </h2>
+                   <p className="text-stone-400 text-sm md:text-lg italic font-serif">
+                     {CATEGORY_QUOTES[activeCategory] || "Curated for your sanctuary."}
+                   </p>
+                 </div>
+                 <Link to="/shop" className="text-[9px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 border-b border-stone-200 pb-1 hover:border-stone-900 transition-all">
+                   View Full Archive
+                 </Link>
               </div>
 
-              <div ref={gridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12">
+              <div ref={gridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12">
                  {filteredProducts.map(product => (
                     <Link key={product.id} to={`/product/${product.id}`} className="group block">
-                       <div className="relative aspect-[3/4] overflow-hidden bg-stone-50 mb-6 rounded-[2rem] shadow-sm">
+                       <div className="relative aspect-[3/4] overflow-hidden bg-white mb-4 md:mb-6 rounded-[1.5rem] md:rounded-[2rem] shadow-sm">
                           <img 
                            src={product.image} 
                            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105" 
                            alt={product.name} 
                           />
                           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10">
-                             <div className="bg-white/95 backdrop-blur-md text-stone-900 px-6 py-3 rounded-full flex items-center gap-2 text-[9px] font-black uppercase tracking-widest shadow-xl">
+                             <div className="bg-white/95 backdrop-blur-md text-stone-900 px-4 py-2 md:px-6 md:py-3 rounded-full flex items-center gap-2 text-[8px] md:text-[9px] font-black uppercase tracking-widest shadow-xl">
                                 Acquire <ArrowUpRight size={14} />
                              </div>
                           </div>
                        </div>
                        <div className="text-center space-y-1">
-                          <h3 className="text-lg font-serif text-stone-900 truncate">{product.name}</h3>
-                          <p className="text-[9px] uppercase tracking-widest font-black text-stone-300">${product.price.toLocaleString()}</p>
+                          <h3 className="text-sm md:text-lg font-serif text-stone-900 truncate px-2">{product.name}</h3>
+                          <p className="text-[8px] md:text-[9px] uppercase tracking-widest font-black text-stone-300">₹{product.price.toLocaleString()}</p>
                        </div>
                     </Link>
                  ))}
@@ -128,9 +168,9 @@ const RoomDetail: React.FC = () => {
       )}
 
       {!activeCategory && (
-        <section className="py-32 text-center">
-           <div className="w-px h-20 bg-stone-100 mx-auto animate-pulse mb-8" />
-           <p className="text-stone-300 text-[9px] uppercase tracking-[0.6em] font-black">Choose a portal to browse pieces</p>
+        <section className="py-32 text-center bg-stone-50">
+           <div className="w-px h-20 bg-stone-200 mx-auto animate-pulse mb-8" />
+           <p className="text-stone-400 text-[9px] uppercase tracking-[0.6em] font-black">Select an atmosphere to reveal products</p>
         </section>
       )}
     </div>

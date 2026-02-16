@@ -1,31 +1,46 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { PRODUCTS } from '../constants';
+import { fetchProducts } from '../services/productService';
+import { Product } from '../types';
 
 const NewArrivals: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const items = PRODUCTS.filter(p => p.newArrival).slice(0, 3);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.reveal-item', {
-        y: 100,
-        opacity: 0,
-        duration: 1.5,
-        stagger: 0.3,
-        ease: 'power4.out',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top 70%',
-        }
-      });
-    }, containerRef);
-
-    return () => ctx.revert();
+    const loadData = async () => {
+      const data = await fetchProducts();
+      setProducts(data);
+    };
+    loadData();
   }, []);
+
+  const items = products.filter(p => p.newArrival).slice(0, 3);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      const ctx = gsap.context(() => {
+        gsap.from('.reveal-item', {
+          y: 100,
+          opacity: 0,
+          duration: 1.5,
+          stagger: 0.3,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top 70%',
+          }
+        });
+      }, containerRef);
+
+      return () => ctx.revert();
+    }
+  }, [items]);
+
+  if (items.length === 0) return null;
 
   return (
     <section ref={containerRef} className="py-24 md:py-40 bg-[#fdfaf5]">
@@ -69,7 +84,7 @@ const NewArrivals: React.FC = () => {
                       <h4 className="text-2xl font-serif group-hover:translate-x-1 transition-transform">{product.name}</h4>
                       <p className="text-neutral-400 text-sm italic">{product.material}</p>
                     </div>
-                    <span className="text-lg font-serif italic">${product.price}</span>
+                    <span className="text-lg font-serif italic">₹{product.price.toLocaleString()}</span>
                   </div>
                 </Link>
               </div>
