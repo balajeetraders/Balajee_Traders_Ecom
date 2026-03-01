@@ -56,7 +56,7 @@ const LifestyleCollections: React.FC = () => {
             <div className="relative aspect-[4/5] md:aspect-[3/2] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden shadow-2xl bg-stone-100">
               <div ref={imageRef} className="absolute inset-0 -top-20 h-[120%] w-full">
                 <img 
-                  src="https://images.pexels.com/photos/3797991/pexels-photo-3797991.jpeg?auto=compress&cs=tinysrgb&w=1600" 
+                  src="https://images.unsplash.com/photo-1513584684374-8bdb74838a0f?auto=format&fit=crop&q=80&w=2400" 
                   alt="Curated Living Space"
                   className="w-full h-full object-cover"
                 />

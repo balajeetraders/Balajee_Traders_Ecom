@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200">
+  <!-- Rounded square border -->
+  <rect x="5" y="5" width="90" height="90" rx="16" ry="16"
+        fill="white" stroke="#c86030" stroke-width="6"/>
+  <!-- Stylized BT monogram -->
+  <!-- B: vertical bar -->
+  <rect x="24" y="22" width="7" height="56" rx="2" fill="#c86030"/>
+  <!-- B: top bump -->
+  <path d="M31 22 Q52 22 52 33 Q52 44 31 44" fill="none" stroke="#c86030" stroke-width="7" stroke-linecap="round"/>
+  <!-- B: bottom bump -->
+  <path d="M31 44 Q55 44 55 56 Q55 68 31 78" fill="none" stroke="#c86030" stroke-width="7" stroke-linecap="round"/>
+  <!-- T: horizontal bar -->
+  <rect x="57" y="22" width="22" height="7" rx="2" fill="#c86030"/>
+  <!-- T: vertical bar -->
+  <rect x="64" y="22" width="7" height="42" rx="2" fill="#c86030"/>
+</svg>

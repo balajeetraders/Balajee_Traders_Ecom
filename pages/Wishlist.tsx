@@ -1,9 +1,10 @@
 
 import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, X, Heart, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { Product } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface WishlistProps {
   wishlist: Product[];
@@ -14,6 +15,8 @@ interface WishlistProps {
 const Wishlist: React.FC<WishlistProps> = ({ wishlist, onToggleWishlist, onAddToCart }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const insectRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -37,6 +40,15 @@ const Wishlist: React.FC<WishlistProps> = ({ wishlist, onToggleWishlist, onAddTo
     }, containerRef);
     return () => ctx.revert();
   }, [wishlist.length]);
+
+  const handleAddToCart = (product: Product) => {
+    if (!user) {
+      alert("Please sign in to shop.");
+      navigate('/account');
+      return;
+    }
+    onAddToCart({ ...product, quantity: 1 });
+  };
 
   return (
     <div ref={containerRef} className="pt-24 pb-32 md:pt-40 md:pb-40 bg-white min-h-screen">
@@ -112,7 +124,7 @@ const Wishlist: React.FC<WishlistProps> = ({ wishlist, onToggleWishlist, onAddTo
                         <h4 className="text-lg font-serif text-stone-900 leading-tight">{product.name}</h4>
                         <span className="text-sm font-bold text-stone-900">₹{product.price.toLocaleString()}</span>
                       </div>
-                      <button onClick={() => onAddToCart({ ...product, quantity: 1 })} className="w-full py-4 border-2 border-stone-900 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-stone-900 hover:text-white transition-all">Add to Bag <ShoppingBag size={12} /></button>
+                      <button onClick={() => handleAddToCart(product)} className="w-full py-4 border-2 border-stone-900 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-stone-900 hover:text-white transition-all">Add to Bag <ShoppingBag size={12} /></button>
                     </div>
                   </div>
                 ))}
@@ -126,4 +138,3 @@ const Wishlist: React.FC<WishlistProps> = ({ wishlist, onToggleWishlist, onAddTo
 };
 
 export default Wishlist;
-    

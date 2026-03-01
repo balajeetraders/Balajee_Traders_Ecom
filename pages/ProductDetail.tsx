@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Star, Truck, ShieldCheck, Minus, Plus, ArrowRight, Share2, Heart, ChevronLeft, Sparkles, Loader2, Calendar, ShoppingBag, Check } from 'lucide-react';
+import { Star, Truck, ShieldCheck, Minus, Plus, ArrowRight, Share2, Heart, ChevronLeft, Sparkles, Loader2, Calendar, ShoppingBag, Check, X, Send } from 'lucide-react';
 import gsap from 'gsap';
 import { Product } from '../types';
 import { fetchProductById } from '../services/productService';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 interface ProductDetailProps {
   onAddToCart: (product: Product & { selectedColor?: string, selectedSize?: string, quantity?: number }) => void;
@@ -15,6 +17,8 @@ interface ProductDetailProps {
 const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart, wishlist, onToggleWishlist }) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
+  
   const [product, setProduct] = useState<Product | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -22,6 +26,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart, wishlist, on
   const [selectedSize, setSelectedSize] = useState<string | undefined>();
   const [activeImage, setActiveImage] = useState<string>('');
   
+  // Review Modal State
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
   // Zoom State
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
@@ -87,10 +97,61 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart, wishlist, on
     setIsZooming(true);
   };
 
+  // --- PROTECTED ACTIONS ---
+  const checkAuth = () => {
+    if (!user) {
+      alert("Please sign in to continue.");
+      navigate('/account');
+      return false;
+    }
+    return true;
+  };
+
+  const handleAddToCart = () => {
+    if (checkAuth() && product) {
+      onAddToCart({ ...product, quantity, selectedColor, selectedSize });
+    }
+  };
+
   const handleBuyNow = () => {
-    if (!product) return;
-    onAddToCart({ ...product, quantity, selectedColor, selectedSize });
-    navigate('/checkout');
+    if (checkAuth() && product) {
+      onAddToCart({ ...product, quantity, selectedColor, selectedSize });
+      navigate('/checkout');
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    if (checkAuth() && product) {
+      onToggleWishlist(product);
+    }
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!checkAuth() || !product) return;
+
+    setIsSubmittingReview(true);
+    try {
+      // For simplicity, we assume we have a `reviews` table.
+      // If not, this might fail, but the user requested the feedback feature.
+      const { error } = await supabase.from('reviews').insert({
+        product_id: product.id,
+        user_id: user?.id,
+        user_name: profile?.first_name || 'Customer',
+        rating: reviewRating,
+        comment: reviewComment
+      });
+      
+      if (error) throw error;
+      alert("Review submitted successfully!");
+      setIsReviewOpen(false);
+      setReviewComment('');
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit review.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   const isWishlisted = wishlist.some(p => p.id === product?.id);
@@ -183,7 +244,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart, wishlist, on
 
              {/* Reviews Section (Desktop Position) */}
              <div className="hidden lg:block pt-8 border-t border-stone-200">
-                <ReviewsSection rating={product.rating} count={product.reviewCount} />
+                <ReviewsSection rating={product.rating} count={product.reviewCount} onWriteReview={() => checkAuth() && setIsReviewOpen(true)} />
              </div>
           </div>
 
@@ -276,7 +337,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart, wishlist, on
                     {/* Responsive Buttons: Stack on mobile, Row on desktop */}
                     <div className="flex flex-1 flex-col sm:flex-row gap-3">
                       <button 
-                        onClick={() => onAddToCart({ ...product, quantity, selectedColor, selectedSize })} 
+                        onClick={handleAddToCart} 
                         className="flex-1 border-2 border-stone-900 text-stone-900 bg-transparent rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-stone-50 transition-all h-12 md:h-14"
                       >
                         <ShoppingBag size={16} /> Add to Bag
@@ -292,7 +353,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart, wishlist, on
                  
                  <div className="flex items-center justify-between pt-2">
                     <button 
-                      onClick={() => onToggleWishlist(product)}
+                      onClick={handleToggleWishlist}
                       className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${isWishlisted ? 'text-red-500' : 'text-stone-400 hover:text-stone-900'}`}
                     >
                       <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} /> 
@@ -318,22 +379,59 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ onAddToCart, wishlist, on
 
             {/* Reviews Mobile Position */}
             <div className="lg:hidden pt-8 border-t border-stone-200">
-                <ReviewsSection rating={product.rating} count={product.reviewCount} />
+                <ReviewsSection rating={product.rating} count={product.reviewCount} onWriteReview={() => checkAuth() && setIsReviewOpen(true)} />
              </div>
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      {isReviewOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm">
+           <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl animate-in zoom-in duration-300 relative">
+             <button onClick={() => setIsReviewOpen(false)} className="absolute top-4 right-4 p-2 text-stone-400 hover:text-stone-900"><X size={20}/></button>
+             
+             <form onSubmit={handleSubmitReview} className="space-y-6">
+                <div className="text-center space-y-2">
+                   <h3 className="text-2xl font-serif text-stone-900">Your Feedback</h3>
+                   <p className="text-xs text-stone-400">Rate your experience with {product.name}</p>
+                </div>
+                
+                <div className="flex justify-center gap-2">
+                   {[1, 2, 3, 4, 5].map((star) => (
+                      <button type="button" key={star} onClick={() => setReviewRating(star)} className="p-1 transition-transform hover:scale-110">
+                         <Star size={32} fill={star <= reviewRating ? "#EAB308" : "none"} className={star <= reviewRating ? "text-yellow-500" : "text-stone-300"} />
+                      </button>
+                   ))}
+                </div>
+
+                <textarea 
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share your thoughts..."
+                  rows={4}
+                  required
+                  className="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none focus:border-stone-900 text-sm resize-none"
+                />
+
+                <button disabled={isSubmittingReview} className="w-full h-12 bg-stone-900 text-white rounded-full flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all">
+                   {isSubmittingReview ? <Loader2 className="animate-spin" size={16} /> : 'Submit Review'}
+                </button>
+             </form>
+           </div>
+        </div>
+      )}
     </div>
   );
 };
 
 // Reviews Component
-const ReviewsSection = ({ rating, count }: { rating: number, count: number }) => {
+const ReviewsSection = ({ rating, count, onWriteReview }: { rating: number, count: number, onWriteReview: () => void }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-serif text-stone-900">Client Reviews</h3>
-        <button className="text-[10px] font-black uppercase tracking-widest border-b border-stone-900">Write a Review</button>
+        <button onClick={onWriteReview} className="text-[10px] font-black uppercase tracking-widest border-b border-stone-900 hover:text-stone-600">Write a Review</button>
       </div>
       
       <div className="flex items-center gap-4 bg-stone-50 p-6 rounded-2xl">

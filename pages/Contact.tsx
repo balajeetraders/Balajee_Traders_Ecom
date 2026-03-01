@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Mail, Phone, Users, MessageSquare, Send, User, AtSign, AlignLeft } from 'lucide-react';
+import { MapPin, Mail, Phone, MessageSquare, Send, User, AtSign, AlignLeft } from 'lucide-react';
 import gsap from 'gsap';
 
 const Contact: React.FC = () => {
@@ -50,53 +50,44 @@ const Contact: React.FC = () => {
       {/* Info Cards Grid */}
       <section className="py-24">
         <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 items-stretch">
             
             {/* Office Location */}
-            <div className="space-y-6 reveal-up">
-              <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
+            <div className="space-y-6 reveal-up text-center flex flex-col items-center">
+              <div className="flex items-center justify-center gap-3 border-b border-stone-100 pb-4 w-full">
                 <MapPin size={18} className="text-stone-900" />
                 <h3 className="text-xs uppercase font-bold tracking-widest text-stone-900">Office location</h3>
               </div>
               <div className="text-sm text-stone-500 leading-relaxed">
-                <p>16122 Collins street,</p>
-                <p>Melbourne, Australia</p>
+                <p>No.4, 5th main street, 7th cross,</p>
+                <p>Srinivasa nagar, Vayalur road,</p>
+                <p>Trichy-620017</p>
               </div>
             </div>
 
             {/* Send a Message */}
-            <div className="space-y-6 reveal-up">
-              <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
+            <div className="space-y-6 reveal-up text-center flex flex-col items-center">
+              <div className="flex items-center justify-center gap-3 border-b border-stone-100 pb-4 w-full">
                 <Mail size={18} className="text-stone-900" />
                 <h3 className="text-xs uppercase font-bold tracking-widest text-stone-900">Send a message</h3>
               </div>
               <div className="text-sm text-stone-500 leading-relaxed">
-                <p>info@yourdomain.com</p>
-                <p>sales@yourdomain.com</p>
+                <a href="mailto:balajeetraderstry@gmail.com" className="text-stone-600 hover:text-stone-900 transition-colors">
+                  balajeetraderstry@gmail.com
+                </a>
               </div>
             </div>
 
             {/* Call us Directly */}
-            <div className="space-y-6 reveal-up">
-              <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
+            <div className="space-y-6 reveal-up text-center flex flex-col items-center">
+              <div className="flex items-center justify-center gap-3 border-b border-stone-100 pb-4 w-full">
                 <Phone size={18} className="text-stone-900" />
                 <h3 className="text-xs uppercase font-bold tracking-widest text-stone-900">Call us directly</h3>
               </div>
               <div className="text-sm text-stone-500 leading-relaxed">
-                <p>1-800-222-000</p>
-                <p>1-800-222-002</p>
-              </div>
-            </div>
-
-            {/* Join our Team */}
-            <div className="space-y-6 reveal-up">
-              <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
-                <Users size={18} className="text-stone-900" />
-                <h3 className="text-xs uppercase font-bold tracking-widest text-stone-900">Join our team</h3>
-              </div>
-              <div className="text-sm text-stone-500 leading-relaxed">
-                <p>hire@yourdomain.com</p>
-                <p>hr@yourdomain.com</p>
+                <a href="tel:+916380473964" className="text-stone-600 hover:text-stone-900 transition-colors">
+                  +91 63804 73964
+                </a>
               </div>
             </div>
 
@@ -178,9 +169,9 @@ const Contact: React.FC = () => {
       {/* Map Section */}
       <section className="w-full h-[500px] relative bg-stone-100 grayscale hover:grayscale-0 transition-all duration-1000">
         <iframe 
-          title="Google Map"
+          title="Balajee Traders - Srinivasa Nagar Trichy"
           className="w-full h-full border-none"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509374!2d144.95373531531615!3d-37.81720997975171!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65d4c2b349649%3A0xb6899234e561db!2sCollins%20St%2C%20Melbourne%20VIC%2C%20Australia!5e0!3m2!1sen!2sus!4v1625484832523!5m2!1sen!2sus"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.441!2d78.6852!3d10.8085!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3baaeb0a4d58c251%3A0x5042e90b5c4a1e5!2sSrinivasa%20Nagar%2C%20Tiruchirappalli%2C%20Tamil%20Nadu%20620017!5e0!3m2!1sen!2sin!4v1700000000!5m2!1sen!2sin"
         />
         
         {/* Map Overlay Card */}
@@ -188,11 +179,16 @@ const Contact: React.FC = () => {
           <div className="bg-white p-8 shadow-2xl text-center min-w-[300px] border border-stone-50">
             <h4 className="text-xl font-serif text-stone-900 mb-2">Balajee Traders Store</h4>
             <p className="text-[10px] uppercase font-bold tracking-widest text-stone-400 mb-6 leading-relaxed">
-              16122 Collins street,<br /> Melbourne, Australia
+              No.4, 5th main street, 7th cross,<br /> Srinivasa nagar, Vayalur road, Trichy-620017
             </p>
-            <button className="bg-stone-900 text-white px-8 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-colors w-full">
+            <a 
+              href="https://www.google.com/maps/search/No.4+5th+main+street+7th+cross+srinivasa+nagar+vayalur+road+trichy+620017" 
+              target="_blank" 
+              rel="noreferrer"
+              className="block bg-stone-900 text-white px-8 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-colors w-full text-center"
+            >
               View larger map
-            </button>
+            </a>
           </div>
         </div>
       </section>

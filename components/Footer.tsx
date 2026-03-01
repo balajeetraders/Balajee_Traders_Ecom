@@ -1,14 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Instagram, 
-  Twitter, 
-  Facebook, 
-  Globe, 
-  Truck, 
-  MapPin, 
-  CreditCard, 
+import {
+  Instagram,
+  Twitter,
+  Facebook,
+  Globe,
+  Truck,
+  MapPin,
+  CreditCard,
   Headphones,
   Mail,
   Phone,
@@ -76,14 +76,14 @@ const Footer: React.FC = () => {
       <div className="bg-[#1a202c] text-white pt-24 pb-12">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-20">
-            
+
             {/* Brand Column */}
             <div className="lg:col-span-2 space-y-8">
               <Link to="/" className="flex items-center gap-2.5 group">
-                <img 
-                  src="/logo.png" 
-                  alt="Balajee Traders" 
-                  className="h-10 w-auto object-contain brightness-0 invert" 
+                <img
+                  src="/logo.png"
+                  alt="Balajee Traders"
+                  className="h-10 w-auto object-contain brightness-0 invert"
                 />
                 <span className="text-2xl font-bold tracking-tighter text-white">
                   Balajee Traders
@@ -117,7 +117,11 @@ const Footer: React.FC = () => {
                 <li><a href="#" className="hover:text-white transition-colors">About us</a></li>
                 <li><Link to="/contact" className="hover:text-white transition-colors">Contact us</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Payment</a></li>
+                <li><Link to="/terms-and-conditions" className="hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
+                <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
+                <li><Link to="/return-policy" className="hover:text-white transition-colors">Return Policy</Link></li>
+                <li><Link to="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link></li>
               </ul>
             </div>
 
@@ -136,13 +140,17 @@ const Footer: React.FC = () => {
           <div className="pt-12 border-t border-white/5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
             <div className="space-y-2">
               <p className="text-[10px] text-stone-500 max-w-md">
-                This site is protected by reCAPTCHA and the Google <a href="#" className="underline">privacy policy</a> and terms of service apply.
+                This site is protected by reCAPTCHA and the Google{' '}
+                <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="underline">
+                  privacy policy
+                </a>{' '}
+                and terms of service apply.
               </p>
               <p className="text-[10px] text-stone-500">
                 © 2026 Balajee Traders. All Rights Reserved.
               </p>
             </div>
-            
+
             <div className="flex flex-col md:flex-row gap-10 md:gap-20">
               <div className="flex flex-col">
                 <span className="text-[10px] uppercase font-bold tracking-widest text-stone-500 mb-2">Need support?</span>
@@ -154,21 +162,8 @@ const Footer: React.FC = () => {
               </div>
             </div>
           </div>
-          
-          {/* SYSTEM STATUS INDICATOR - VISIBLE TO CONFIRM BACKEND */}
-          <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-center lg:justify-start gap-2 opacity-50 hover:opacity-100 transition-opacity">
-            {dataStatus === 'live' ? (
-              <>
-                <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse"></div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-green-500">System Status: Live (Backend Active)</span>
-              </>
-            ) : (
-              <>
-                <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
-                <span className="text-[9px] font-black uppercase tracking-widest text-red-500">System Status: Static (Local Mode)</span>
-              </>
-            )}
-          </div>
+
+          {/* System Status - hidden from frontend */}
 
         </div>
       </div>

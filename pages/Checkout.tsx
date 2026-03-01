@@ -1,16 +1,16 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  ChevronLeft, 
-  Lock, 
-  ArrowRight, 
-  CreditCard, 
-  Truck, 
-  CheckCircle, 
-  Phone, 
-  MapPin, 
-  Package, 
+import {
+  ChevronLeft,
+  Lock,
+  ArrowRight,
+  CreditCard,
+  Truck,
+  CheckCircle,
+  Phone,
+  MapPin,
+  Package,
   Smartphone,
   QrCode,
   Loader2,
@@ -21,6 +21,7 @@ import { CartItem, Order } from '../types';
 import { simulatePhonePePayment, generateUPIIntentLink } from '../lib/phonepe';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import ReviewModal from '../components/ReviewModal';
 
 interface CheckoutProps {
   cart: CartItem[];
@@ -37,9 +38,11 @@ const Checkout: React.FC<CheckoutProps> = ({ cart, onPlaceOrder }) => {
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [lastOrderId, setLastOrderId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'phonepe' | 'card' | 'cod'>('phonepe');
   const [shippingMethod, setShippingMethod] = useState('white-glove');
-  
+
   // Form State
   const [formData, setFormData] = useState({
     firstName: '',
@@ -125,10 +128,10 @@ ${itemsList}
 
   const processOrder = async () => {
     setIsProcessing(true);
-    
+
     // 1. Generate ID
     const orderId = `BT-${Math.floor(Math.random() * 900000) + 100000}`;
-    
+
     const newOrder: Order = {
       id: orderId,
       date: new Date().toISOString(),
@@ -169,11 +172,14 @@ ${itemsList}
 
       // 4. Send Telegram & Finish
       await sendTelegramNotification(newOrder);
-      
+
       onPlaceOrder(newOrder);
+      setLastOrderId(orderId);
       setIsProcessing(false);
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Show feedback modal after 2.5 seconds so user sees success first
+      setTimeout(() => setShowReview(true), 2500);
 
     } catch (error: any) {
       console.error("Order Failed:", error.message);
@@ -187,7 +193,7 @@ ${itemsList}
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     const success = await simulatePhonePePayment(BOOKING_AMOUNT);
-    
+
     if (success) {
       processOrder();
     } else {
@@ -218,175 +224,175 @@ ${itemsList}
             <ChevronLeft size={16} /> Return to Shop
           </Link>
           <div className="flex items-center gap-3">
-             <Lock size={14} className="text-stone-300" />
-             <span className="text-[10px] uppercase tracking-widest font-black text-stone-300">Secure Reservation</span>
+            <Lock size={14} className="text-stone-300" />
+            <span className="text-[10px] uppercase tracking-widest font-black text-stone-300">Secure Reservation</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-24">
           <div className="lg:col-span-7 space-y-8 md:space-y-12">
             <div className="flex items-center justify-between pb-8 md:pb-12 border-b border-stone-100">
-               {[1, 2, 3].map(i => (
-                 <div key={i} className={`flex items-center gap-3 md:gap-4 transition-all duration-500 ${step >= i ? 'text-stone-900' : 'text-stone-300'}`}>
-                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[10px] md:text-xs font-black border-2 transition-all duration-500 ${step >= i ? 'border-stone-900 bg-stone-900 text-white shadow-xl' : 'border-stone-100'}`}>
-                       {step > i ? <CheckCircle size={18} /> : i}
-                    </div>
-                    <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] font-black hidden xs:block">{i === 1 ? 'Identity' : i === 2 ? 'Logistics' : 'Deposit'}</span>
-                 </div>
-               ))}
+              {[1, 2, 3].map(i => (
+                <div key={i} className={`flex items-center gap-3 md:gap-4 transition-all duration-500 ${step >= i ? 'text-stone-900' : 'text-stone-300'}`}>
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-[10px] md:text-xs font-black border-2 transition-all duration-500 ${step >= i ? 'border-stone-900 bg-stone-900 text-white shadow-xl' : 'border-stone-100'}`}>
+                    {step > i ? <CheckCircle size={18} /> : i}
+                  </div>
+                  <span className="text-[9px] md:text-[11px] uppercase tracking-[0.2em] font-black hidden xs:block">{i === 1 ? 'Identity' : i === 2 ? 'Logistics' : 'Deposit'}</span>
+                </div>
+              ))}
             </div>
 
             <form onSubmit={handleNext} className="space-y-10 md:space-y-12">
-               {step === 1 && (
-                 <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <h2 className="text-4xl md:text-5xl font-serif">Delivery Identity</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                       <Input 
-                         name="firstName" 
-                         label="First Name" 
-                         placeholder="Julius" 
-                         value={formData.firstName} 
-                         onChange={handleInputChange} 
-                         required 
-                       />
-                       <Input 
-                         name="lastName" 
-                         label="Last Name" 
-                         placeholder="Wright" 
-                         value={formData.lastName} 
-                         onChange={handleInputChange} 
-                         required 
-                       />
-                       <div className="md:col-span-2">
-                         <Input 
-                           name="phone" 
-                           label="Mobile Phone Number" 
-                           type="tel" 
-                           placeholder="+91 63904 73964" 
-                           value={formData.phone} 
-                           onChange={handleInputChange} 
-                           required 
-                         />
-                       </div>
-                       <div className="md:col-span-2">
-                         <Input 
-                           name="address" 
-                           label="Structural Address" 
-                           placeholder="Suite 402, Architectural Plaza" 
-                           value={formData.address} 
-                           onChange={handleInputChange} 
-                           required 
-                         />
-                       </div>
-                       <Input 
-                         name="city" 
-                         label="City" 
-                         placeholder="Tiruchirappalli" 
-                         value={formData.city} 
-                         onChange={handleInputChange} 
-                         required 
-                       />
-                       <Input 
-                         name="zip" 
-                         label="Postal Code" 
-                         placeholder="620017" 
-                         value={formData.zip} 
-                         onChange={handleInputChange} 
-                         required 
-                       />
+              {step === 1 && (
+                <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <h2 className="text-4xl md:text-5xl font-serif">Delivery Identity</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <Input
+                      name="firstName"
+                      label="First Name"
+                      placeholder="Julius"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <Input
+                      name="lastName"
+                      label="Last Name"
+                      placeholder="Wright"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <div className="md:col-span-2">
+                      <Input
+                        name="phone"
+                        label="Mobile Phone Number"
+                        type="tel"
+                        placeholder="+91 63904 73964"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
-                 </div>
-               )}
-
-               {step === 2 && (
-                 <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <h2 className="text-4xl md:text-5xl font-serif">Logistics Preference</h2>
-                    <div className="space-y-4">
-                       <ShippingOption id="white-glove" icon={<Package size={24} />} title="White-Glove Delivery" price="Free" desc="Includes assembly and layout." active={shippingMethod === 'white-glove'} onSelect={() => setShippingMethod('white-glove')} />
-                       <ShippingOption id="showroom" icon={<Building2 size={24} />} title="Showroom Pickup" price="Free" desc="Visit our Srinivasa Nagar gallery." active={shippingMethod === 'showroom'} onSelect={() => setShippingMethod('showroom')} />
+                    <div className="md:col-span-2">
+                      <Input
+                        name="address"
+                        label="Structural Address"
+                        placeholder="Suite 402, Architectural Plaza"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
-                 </div>
-               )}
+                    <Input
+                      name="city"
+                      label="City"
+                      placeholder="Tiruchirappalli"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <Input
+                      name="zip"
+                      label="Postal Code"
+                      placeholder="620017"
+                      value={formData.zip}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
 
-               {step === 3 && (
-                 <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <h2 className="text-4xl md:text-5xl font-serif">Booking Deposit</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      
-                      {/* PhonePe Option */}
-                      <button type="button" onClick={() => setPaymentMethod('phonepe')} className={`py-5 px-6 rounded-3xl border-2 transition-all relative overflow-hidden ${paymentMethod === 'phonepe' ? 'border-[#5f259f] bg-[#5f259f]/5' : 'border-stone-100 bg-white text-stone-400'}`}>
-                        {paymentMethod === 'phonepe' && <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#5f259f] animate-pulse" />}
-                        <div className="flex flex-col items-center">
-                           <div className="w-8 h-8 rounded-full bg-[#5f259f] text-white flex items-center justify-center font-bold text-lg mb-2">Pe</div>
-                           <span className={`text-[10px] font-black uppercase ${paymentMethod === 'phonepe' ? 'text-[#5f259f]' : ''}`}>PhonePe</span>
+              {step === 2 && (
+                <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <h2 className="text-4xl md:text-5xl font-serif">Logistics Preference</h2>
+                  <div className="space-y-4">
+                    <ShippingOption id="white-glove" icon={<Package size={24} />} title="White-Glove Delivery" price="Free" desc="Includes assembly and layout." active={shippingMethod === 'white-glove'} onSelect={() => setShippingMethod('white-glove')} />
+                    <ShippingOption id="showroom" icon={<Building2 size={24} />} title="Showroom Pickup" price="Free" desc="Visit our Srinivasa Nagar gallery." active={shippingMethod === 'showroom'} onSelect={() => setShippingMethod('showroom')} />
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <h2 className="text-4xl md:text-5xl font-serif">Booking Deposit</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+                    {/* PhonePe Option */}
+                    <button type="button" onClick={() => setPaymentMethod('phonepe')} className={`py-5 px-6 rounded-3xl border-2 transition-all relative overflow-hidden ${paymentMethod === 'phonepe' ? 'border-[#5f259f] bg-[#5f259f]/5' : 'border-stone-100 bg-white text-stone-400'}`}>
+                      {paymentMethod === 'phonepe' && <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#5f259f] animate-pulse" />}
+                      <div className="flex flex-col items-center">
+                        <div className="w-8 h-8 rounded-full bg-[#5f259f] text-white flex items-center justify-center font-bold text-lg mb-2">Pe</div>
+                        <span className={`text-[10px] font-black uppercase ${paymentMethod === 'phonepe' ? 'text-[#5f259f]' : ''}`}>PhonePe</span>
+                      </div>
+                    </button>
+
+                    <button type="button" onClick={() => setPaymentMethod('card')} className={`py-5 px-6 rounded-3xl border-2 transition-all ${paymentMethod === 'card' ? 'border-stone-900 bg-stone-900 text-white shadow-xl' : 'border-stone-100 bg-white text-stone-400'}`}><CreditCard size={24} /><span className="text-[10px] font-black uppercase mt-3 block">Card</span></button>
+                    <button type="button" onClick={() => setPaymentMethod('cod')} className={`py-5 px-6 rounded-3xl border-2 transition-all ${paymentMethod === 'cod' ? 'border-stone-900 bg-stone-900 text-white shadow-xl' : 'border-stone-100 bg-white text-stone-400'}`}><Truck size={24} /><span className="text-[10px] font-black uppercase mt-3 block">Shop</span></button>
+                  </div>
+
+                  <div className="p-8 bg-white border border-stone-100 rounded-[2rem] shadow-sm animate-in zoom-in duration-300">
+
+                    {paymentMethod === 'phonepe' && (
+                      <div className="text-center space-y-6">
+                        <h4 className="text-sm font-black uppercase text-[#5f259f]">Secure UPI Payment</h4>
+                        <p className="text-[11px] text-stone-400 leading-relaxed max-w-xs mx-auto">
+                          You will be redirected to the PhonePe gateway to complete your transaction safely.
+                        </p>
+                        <div className="flex justify-center gap-4">
+                          <div className="flex flex-col items-center gap-2 p-4 bg-stone-50 rounded-xl">
+                            <Smartphone size={24} className="text-[#5f259f]" />
+                            <span className="text-[9px] font-bold uppercase text-stone-400">App</span>
+                          </div>
+                          <div className="flex flex-col items-center gap-2 p-4 bg-stone-50 rounded-xl">
+                            <QrCode size={24} className="text-[#5f259f]" />
+                            <span className="text-[9px] font-bold uppercase text-stone-400">QR Code</span>
+                          </div>
                         </div>
-                      </button>
 
-                      <button type="button" onClick={() => setPaymentMethod('card')} className={`py-5 px-6 rounded-3xl border-2 transition-all ${paymentMethod === 'card' ? 'border-stone-900 bg-stone-900 text-white shadow-xl' : 'border-stone-100 bg-white text-stone-400'}`}><CreditCard size={24} /><span className="text-[10px] font-black uppercase mt-3 block">Card</span></button>
-                      <button type="button" onClick={() => setPaymentMethod('cod')} className={`py-5 px-6 rounded-3xl border-2 transition-all ${paymentMethod === 'cod' ? 'border-stone-900 bg-stone-900 text-white shadow-xl' : 'border-stone-100 bg-white text-stone-400'}`}><Truck size={24} /><span className="text-[10px] font-black uppercase mt-3 block">Shop</span></button>
-                    </div>
-                    
-                    <div className="p-8 bg-white border border-stone-100 rounded-[2rem] shadow-sm animate-in zoom-in duration-300">
-                       
-                       {paymentMethod === 'phonepe' && (
-                         <div className="text-center space-y-6">
-                            <h4 className="text-sm font-black uppercase text-[#5f259f]">Secure UPI Payment</h4>
-                            <p className="text-[11px] text-stone-400 leading-relaxed max-w-xs mx-auto">
-                              You will be redirected to the PhonePe gateway to complete your transaction safely.
-                            </p>
-                            <div className="flex justify-center gap-4">
-                               <div className="flex flex-col items-center gap-2 p-4 bg-stone-50 rounded-xl">
-                                  <Smartphone size={24} className="text-[#5f259f]" />
-                                  <span className="text-[9px] font-bold uppercase text-stone-400">App</span>
-                               </div>
-                               <div className="flex flex-col items-center gap-2 p-4 bg-stone-50 rounded-xl">
-                                  <QrCode size={24} className="text-[#5f259f]" />
-                                  <span className="text-[9px] font-bold uppercase text-stone-400">QR Code</span>
-                               </div>
-                            </div>
-                            
-                            {/* Mobile Only: UPI Intent Link */}
-                            <div className="md:hidden pt-4">
-                              <a href={upiLink} className="inline-block border-b border-[#5f259f] text-[#5f259f] text-[10px] font-bold uppercase tracking-widest pb-1">
-                                Open PhonePe App Directly
-                              </a>
-                            </div>
-                         </div>
-                       )}
+                        {/* Mobile Only: UPI Intent Link */}
+                        <div className="md:hidden pt-4">
+                          <a href={upiLink} className="inline-block border-b border-[#5f259f] text-[#5f259f] text-[10px] font-bold uppercase tracking-widest pb-1">
+                            Open PhonePe App Directly
+                          </a>
+                        </div>
+                      </div>
+                    )}
 
-                       {paymentMethod === 'card' && <div className="space-y-6"><Input label="Card Number" placeholder="0000 0000 0000 0000" /><div className="grid grid-cols-2 gap-4"><Input label="Expiry" placeholder="MM / YY" /><Input label="CVC" placeholder="000" /></div></div>}
-                       {paymentMethod === 'cod' && <div className="text-center py-6"><h4 className="text-sm font-black uppercase">Pay at Showroom</h4><p className="text-[10px] text-stone-400 italic">Visit our gallery to finalize.</p></div>}
-                    </div>
-                 </div>
-               )}
+                    {paymentMethod === 'card' && <div className="space-y-6"><Input label="Card Number" placeholder="0000 0000 0000 0000" /><div className="grid grid-cols-2 gap-4"><Input label="Expiry" placeholder="MM / YY" /><Input label="CVC" placeholder="000" /></div></div>}
+                    {paymentMethod === 'cod' && <div className="text-center py-6"><h4 className="text-sm font-black uppercase">Pay at Showroom</h4><p className="text-[10px] text-stone-400 italic">Visit our gallery to finalize.</p></div>}
+                  </div>
+                </div>
+              )}
 
-               <button 
-                type="submit" 
-                disabled={isProcessing} 
+              <button
+                type="submit"
+                disabled={isProcessing}
                 className={`w-full py-6 md:py-8 rounded-full flex items-center justify-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl transition-all ${paymentMethod === 'phonepe' ? 'bg-[#5f259f] hover:bg-[#4b1d7f] text-white' : 'bg-stone-900 hover:bg-black text-white'}`}
-               >
-                  {isProcessing ? (
-                    <span className="flex items-center gap-3">
-                      <Loader2 size={16} className="animate-spin" /> 
-                      {paymentMethod === 'phonepe' ? 'Contacting PhonePe...' : 'Processing...'}
-                    </span>
-                  ) : step < 3 ? 'Proceed to Logistics' : `Pay ₹${BOOKING_AMOUNT.toLocaleString()} Deposit`}
-                  {!isProcessing && <ArrowRight size={18} />}
-               </button>
+              >
+                {isProcessing ? (
+                  <span className="flex items-center gap-3">
+                    <Loader2 size={16} className="animate-spin" />
+                    {paymentMethod === 'phonepe' ? 'Contacting PhonePe...' : 'Processing...'}
+                  </span>
+                ) : step < 3 ? 'Proceed to Logistics' : `Pay ₹${BOOKING_AMOUNT.toLocaleString()} Deposit`}
+                {!isProcessing && <ArrowRight size={18} />}
+              </button>
             </form>
           </div>
 
           <div className="lg:col-span-5">
-             <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-stone-100 shadow-sm space-y-10 lg:sticky lg:top-32">
-                <h3 className="text-2xl font-serif">Curated Design</h3>
-                <div className="pt-8 border-t border-stone-50 space-y-5">
-                   <div className="flex justify-between text-[11px] uppercase font-black text-stone-400"><span>Required Booking Deposit</span><span className="text-stone-900">₹{BOOKING_AMOUNT.toLocaleString()}.00</span></div>
-                   <div className="pt-8 border-t border-stone-50 flex justify-between items-end">
-                      <div className="space-y-1"><span className="block text-[10px] uppercase font-black text-stone-300">Amount to Pay Now</span><span className="text-4xl font-serif text-stone-900">₹{BOOKING_AMOUNT.toLocaleString()}.00</span></div>
-                      <div className="flex items-center gap-2 bg-stone-50 px-4 py-2 rounded-full mb-1"><div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /><span className="text-[9px] font-black uppercase text-stone-400">Booking Open</span></div>
-                   </div>
+            <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-stone-100 shadow-sm space-y-10 lg:sticky lg:top-32">
+              <h3 className="text-2xl font-serif">Curated Design</h3>
+              <div className="pt-8 border-t border-stone-50 space-y-5">
+                <div className="flex justify-between text-[11px] uppercase font-black text-stone-400"><span>Required Booking Deposit</span><span className="text-stone-900">₹{BOOKING_AMOUNT.toLocaleString()}.00</span></div>
+                <div className="pt-8 border-t border-stone-50 flex justify-between items-end">
+                  <div className="space-y-1"><span className="block text-[10px] uppercase font-black text-stone-300">Amount to Pay Now</span><span className="text-4xl font-serif text-stone-900">₹{BOOKING_AMOUNT.toLocaleString()}.00</span></div>
+                  <div className="flex items-center gap-2 bg-stone-50 px-4 py-2 rounded-full mb-1"><div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /><span className="text-[9px] font-black uppercase text-stone-400">Booking Open</span></div>
                 </div>
-             </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -398,7 +404,7 @@ ${itemsList}
             <div className="space-y-8">
               <div className="space-y-4">
                 <h2 className="text-3xl md:text-5xl font-serif text-stone-900">Design Reserved</h2>
-                <p className="text-stone-400 text-[10px] uppercase tracking-[0.5em] font-black">Success Code: #{cart[0] ? `BT-${Math.floor(Math.random()*90000)+10000}` : 'ORDER'}</p>
+                <p className="text-stone-400 text-[10px] uppercase tracking-[0.5em] font-black">Success Code: #{cart[0] ? `BT-${Math.floor(Math.random() * 90000) + 10000}` : 'ORDER'}</p>
               </div>
               <div className="py-8 px-6 bg-stone-50 rounded-[2rem] border border-stone-100 space-y-6">
                 <h4 className="text-stone-900 font-serif text-xl md:text-2xl">Visit Our Showroom</h4>
@@ -415,6 +421,13 @@ ${itemsList}
             </div>
           </div>
         </div>
+      )}
+      {/* Post-order review modal */}
+      {showReview && lastOrderId && (
+        <ReviewModal
+          orderId={lastOrderId}
+          onClose={() => setShowReview(false)}
+        />
       )}
     </div>
   );

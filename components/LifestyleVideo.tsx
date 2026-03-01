@@ -10,7 +10,7 @@ const LifestyleVideo: React.FC = () => {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Breathing effect on the video container
-      gsap.fromTo(videoRef.current, 
+      gsap.fromTo(videoRef.current,
         { scale: 1.1 },
         {
           scale: 1,
@@ -41,11 +41,11 @@ const LifestyleVideo: React.FC = () => {
   }, []);
 
   return (
-    <section 
-      ref={containerRef} 
+    <section
+      ref={containerRef}
       className="relative w-full h-[70vh] md:h-screen overflow-hidden bg-stone-900"
     >
-      {/* Sofa background video - showcasing comfort and elegance */}
+      {/* Local home footage video */}
       <video
         ref={videoRef}
         autoPlay
@@ -53,17 +53,18 @@ const LifestyleVideo: React.FC = () => {
         loop
         playsInline
         className="absolute inset-0 w-full h-full object-cover opacity-80"
+        poster="https://images.unsplash.com/photo-1616489953149-7551745cae3a?auto=format&fit=crop&q=80&w=2400"
       >
-        <source 
-          src="/assets/Video Project 3 (1).mp4" 
-          type="video/mp4" 
+        <source
+          src="/assets/Video Project 3 (1).mp4"
+          type="video/mp4"
         />
         Your browser does not support the video tag.
       </video>
 
       {/* Filmic Grain Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-soft-light" />
-      
+
       {/* Soft Vignette */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
 
@@ -71,16 +72,13 @@ const LifestyleVideo: React.FC = () => {
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
         <div ref={labelRef} className="space-y-4 md:space-y-6">
           <span className="text-[10px] md:text-xs uppercase tracking-[0.6em] font-black text-white/50 block">
-            The Art of Comfort
+            The Philosophy of Space
           </span>
           <h2 className="text-5xl md:text-[9vw] font-serif text-white leading-tight tracking-tighter">
-            Where <span className="italic font-light opacity-60">Elegance</span> Meets Rest
+            Living <span className="italic font-light opacity-60">Well</span>
           </h2>
-          <p className="text-white/70 text-sm md:text-lg max-w-2xl mx-auto font-serif italic mt-4">
-            Discover premium sofas crafted for moments of relaxation and timeless style
-          </p>
           <div className="pt-8">
-             <div className="w-px h-16 bg-gradient-to-b from-white/60 to-transparent mx-auto" />
+            <div className="w-px h-16 bg-gradient-to-b from-white/60 to-transparent mx-auto" />
           </div>
         </div>
       </div>
@@ -88,7 +86,7 @@ const LifestyleVideo: React.FC = () => {
       {/* Side Label */}
       <div className="absolute left-6 md:left-12 bottom-12 hidden lg:block">
         <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 rotate-180 [writing-mode:vertical-lr]">
-          Balajee Traders — Premium Comfort
+          Balajee Traders — Real Homes
         </span>
       </div>
     </section>

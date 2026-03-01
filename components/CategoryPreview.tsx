@@ -55,21 +55,21 @@ const CategoryPreview: React.FC = () => {
               Shop by <span className="italic font-light opacity-50">Atmosphere</span>
             </h2>
           </div>
-          
+
           <div className="flex items-center justify-between w-full md:w-auto md:block">
             <p className="text-stone-400 text-sm md:text-base italic font-serif max-w-xs md:text-right hidden md:block">
               Every room tells a story. Select your next chapter.
             </p>
-            
+
             {/* Mobile Navigation Buttons */}
             <div className="flex md:hidden gap-3">
-              <button 
+              <button
                 onClick={scrollLeft}
                 className="w-10 h-10 rounded-full border border-stone-200 flex items-center justify-center text-stone-900 hover:bg-stone-900 hover:text-white transition-colors active:scale-95"
               >
                 <ChevronLeft size={18} />
               </button>
-              <button 
+              <button
                 onClick={scrollRight}
                 className="w-10 h-10 rounded-full border border-stone-200 flex items-center justify-center text-stone-900 hover:bg-stone-900 hover:text-white transition-colors active:scale-95"
               >
@@ -80,25 +80,25 @@ const CategoryPreview: React.FC = () => {
         </div>
 
         {/* Scroll Container */}
-        <div 
-          ref={scrollContainerRef} 
+        <div
+          ref={scrollContainerRef}
           className="w-full overflow-x-auto md:overflow-visible no-scrollbar snap-x snap-mandatory"
         >
           <div className="flex gap-6 md:gap-8 md:grid md:grid-cols-4 w-max md:w-full pb-8 md:pb-0 px-1">
             {ROOMS.map((room) => (
-              <div 
+              <div
                 key={room.id}
-                onClick={() => navigate(`/rooms/${room.id}`)}
+                onClick={() => navigate(`/shop?room=${encodeURIComponent(room.type)}`)}
                 className="category-card group w-[80vw] md:w-auto min-w-[280px] md:min-w-0 cursor-pointer space-y-6 snap-center"
               >
                 <div className="relative aspect-[4/5] rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-stone-50 shadow-sm border border-stone-100/50">
-                  <img 
-                    src={room.image} 
+                  <img
+                    src={room.image}
                     alt={room.type}
                     className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/10 transition-colors duration-700" />
-                  
+
                   {/* Minimal Overlay Button */}
                   <div className="absolute bottom-8 right-8 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                     <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-xl">

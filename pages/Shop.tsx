@@ -1,24 +1,39 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { X, SlidersHorizontal } from 'lucide-react';
+import { X, SlidersHorizontal, Loader2 } from 'lucide-react';
 import gsap from 'gsap';
-import { PRODUCTS, CATEGORIES, ROOMS } from '../constants';
+import { CATEGORIES, ROOMS } from '../constants';
 import { Product } from '../types';
 import ProductCard from '../components/ProductCard';
+import { fetchProducts } from '../services/productService';
 
 const Shop: React.FC<{ wishlist: Product[], onToggleWishlist: (p: Product) => void }> = ({ wishlist, onToggleWishlist }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // Filters
   const categoryFilter = searchParams.get('category') || 'All';
   const roomFilter = searchParams.get('room') || 'All';
   const priceRange = searchParams.get('price') || 'All';
 
+  // 1. Fetch Data on Mount
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      const data = await fetchProducts();
+      setProducts(data);
+      setIsLoading(false);
+    };
+    loadData();
+  }, []);
+
+  // 2. Filter Logic
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return products.filter((p) => {
       const matchCategory = categoryFilter === 'All' || p.category === categoryFilter;
       const matchRoom = roomFilter === 'All' || p.room === roomFilter;
       let matchPrice = true;
@@ -27,14 +42,9 @@ const Shop: React.FC<{ wishlist: Product[], onToggleWishlist: (p: Product) => vo
       else if (priceRange === '100000+') matchPrice = p.price > 100000;
       return matchCategory && matchRoom && matchPrice;
     });
-  }, [categoryFilter, roomFilter, priceRange]);
+  }, [products, categoryFilter, roomFilter, priceRange]);
 
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 400);
-    return () => clearTimeout(timer);
-  }, [categoryFilter, roomFilter, priceRange]);
-
+  // 3. Animation on Data Change
   useEffect(() => {
     if (gridRef.current && !isLoading) {
       gsap.fromTo(gridRef.current.children, 
@@ -62,7 +72,9 @@ const Shop: React.FC<{ wishlist: Product[], onToggleWishlist: (p: Product) => vo
             <h1 className="text-5xl md:text-8xl font-serif text-stone-900 leading-none">Shop <span className="italic font-light opacity-50">All</span></h1>
           </div>
           <div className="flex items-center justify-between md:justify-end gap-4">
-            <span className="text-[10px] text-stone-400 font-black uppercase tracking-widest">{filteredProducts.length} Pieces found</span>
+            <span className="text-[10px] text-stone-400 font-black uppercase tracking-widest">
+              {isLoading ? 'Loading...' : `${filteredProducts.length} Pieces found`}
+            </span>
             <button onClick={() => setIsFilterOpen(true)} className="flex items-center gap-2 px-6 py-3 rounded-full bg-stone-900 text-white text-[10px] font-black uppercase tracking-widest shadow-lg">
               <SlidersHorizontal size={14} /> <span>Filters</span>
             </button>
@@ -81,8 +93,9 @@ const Shop: React.FC<{ wishlist: Product[], onToggleWishlist: (p: Product) => vo
         )}
 
         {isLoading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
-            {[1, 2, 3, 4].map(i => <div key={i} className="animate-pulse aspect-square bg-stone-50 rounded-[3rem]" />)}
+          <div className="flex flex-col items-center justify-center py-40 gap-4">
+             <Loader2 className="animate-spin text-stone-300" size={40} />
+             <p className="text-[10px] uppercase tracking-widest font-black text-stone-300">Retrieving Collection...</p>
           </div>
         ) : filteredProducts.length > 0 ? (
           <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12">
